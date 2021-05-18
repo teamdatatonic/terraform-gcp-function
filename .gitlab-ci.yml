@@ -1,0 +1,68 @@
+image: alpine:latest
+
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}
+  TERRAFORM_VERSION: "0.14.5"
+  TF_DOCS_VERSION: "v0.10.1"
+  TF_IN_AUTOMATION: "TRUE"
+  TEST_DIR: "${CI_PROJECT_DIR}/test/src"
+
+stages:
+  - pre-checks
+  - test
+  - release
+
+precommit:
+  stage: pre-checks
+  image: python:buster
+  script:
+    - apt-get update
+    - apt-get install -y shellcheck
+    - curl -L https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh | bash
+    - tfswitch ${TERRAFORM_VERSION}
+    - TF_DOCS="terraform-docs-${TF_DOCS_VERSION}-linux-amd64"
+    - curl -Lo ./terraform-docs https://github.com/terraform-docs/terraform-docs/releases/download/${TF_DOCS_VERSION}/${TF_DOCS}
+    - chmod +x  ./terraform-docs
+    - mv ./terraform-docs /usr/bin/terraform-docs 
+    - pip3 install pre-commit
+    - pre-commit run --all-files
+
+security-check:
+  stage: pre-checks
+  image: python:alpine
+  before_script:
+    - pip3 install --upgrade pip && pip3 install --upgrade setuptools
+  script:
+    - pip3 install checkov
+    - checkov -d .
+
+# terratest:
+#   stage: test
+#   image:
+#     name: golang:1.16.0-alpine3.13
+#     entrypoint:
+#       - "/usr/bin/env"
+#       - "PATH=/go/bin:/usr/local/go/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#       - "CGO_ENABLED=0"
+#   before_script:
+#     - apk add zip jq git 
+#     - TF_ZIP="terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+#     - wget "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TF_ZIP}"
+#     - unzip ${TF_ZIP} && rm ${TF_ZIP}
+#     - mv terraform /usr/bin/terraform
+#     - cd ${TEST_DIR}
+#     - echo ${GCP_CREDENTIALS} > key.json
+#     - export GOOGLE_APPLICATION_CREDENTIALS="${TEST_DIR}/key.json"
+#   script:
+#     - go test -v -vet=off -timeout 30m 
+
+
+release:
+  image: node:13
+  stage: release
+  script:
+    - npm install @semantic-release/gitlab @semantic-release/exec
+    - npx semantic-release
+  only:
+    refs:
+    - master
