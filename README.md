@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# terraform-gcp-function
-
-=======
 # Terraform Google Cloud Function  
 
 This repo contains Terraform resource module for running an Event Triggered Function on Google Cloud Platform built in accordance to  [best practices for designing, implementing, testing, and deploying Cloud Functions doc by Google](https://cloud.google.com/functions/docs/bestpractices/tips#functions-tips-lazy-globals-go).
@@ -35,4 +31,3 @@ To install commitizen:
 npm install -g commitizen
 ```
 From now on, when commiting code, instead of `git commit`, run `cz -s`
->>>>>>> 66f27ec (feat(initial project setup): initial setup Google Cloud Functions)
