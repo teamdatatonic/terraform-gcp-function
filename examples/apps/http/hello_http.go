@@ -1,4 +1,4 @@
-// Package helloworld provides a set of Cloud Functions example from Google Docs.
+//CF Http helloworld example from Google Docs.
 package helloworld
 
 import (

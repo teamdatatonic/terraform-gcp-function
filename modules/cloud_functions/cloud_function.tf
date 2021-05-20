@@ -6,22 +6,6 @@ Github issue(https://github.com/hashicorp/terraform-provider-google/issues/1938)
 Thus, hacked it by adding the md5 sources as bucket file prefix.
 */
 
-data "archive_file" "function_archive" {
-  type       = "zip"
-  source_dir = "${replace(abspath(path.module), "modules/cloud_functions", "")}${var.app_dir_name}"
-  //"${replace(path.cwd, "env/${var.project_id}", "")}apps/${var.app_dir_name}"
-  output_path = "${var.function_name}_${var.environment}"
-
-
-}
-
-resource "google_storage_bucket_object" "archive" {
-  name   = "${data.archive_file.function_archive.output_path}_${data.archive_file.function_archive.output_md5}.zip"
-  bucket = google_storage_bucket.cf_source_code_reg.name
-  source = data.archive_file.function_archive.output_path
-
-}
-
 resource "google_cloudfunctions_function" "cloud_functions" {
   project                       = var.project_id
   region                        = var.region

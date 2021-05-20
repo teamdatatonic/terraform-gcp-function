@@ -46,7 +46,7 @@ resource "google_vpc_access_connector" "cf-vpc-connector" {
 # ----------------------------------------------------------------------------------------------------------------------
 module "cloud_functions" {
   for_each                = var.cloud_function_configs
-  source                  = "../../modules/cloud_functions"
+  source                  = "./modules/cloud_functions"
   project_id              = var.project_id
   project_number          = var.project_number
   region                  = var.region
