@@ -15,7 +15,7 @@ resource "google_storage_bucket" "cf_source_code_reg" {
 
 data "archive_file" "function_archive" {
   type       = "zip"
-  source_dir = "${replace(abspath(path.module), "modules/cloud_functions", "")}${var.app_dir_name}"
+  source_dir = "${replace(abspath(path.cwd), "modules/cloud_functions", "")}/${var.app_dir_name}"
   //"${replace(path.cwd, "env/${var.project_id}", "")}apps/${var.app_dir_name}"
   output_path = "${var.function_name}_${var.environment}"
 
